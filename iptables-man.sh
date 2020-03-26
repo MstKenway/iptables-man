@@ -47,7 +47,7 @@ get_localIP(){
     read  -p '请输入y/n（默认是y）' input 
     [ "$input" == "y" -o "$input" == "Y" -o "$input" == "" ] && echo $localIP &&return 0
     read -p "请输入您本机IP： " input
-    until echo $input|grep -E "^[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$"
+    until echo $input|grep -E -q "^[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$"
     do 
         read -p "请正确输入您本机IP： " input
     done
@@ -96,7 +96,7 @@ install_iptables(){
 #启用ddns
 enable_ddns(){
     #向crontab添加定时执行脚本，默认2分钟执行一次
-    cat /etc/crontab|grep $SH_FILE
+    cat /etc/crontab|grep -q $SH_FILE
     [ "$?" != "0" ]&& echo "*/2  *  *  *  * root  bash $SH_FILE &> /dev/null" > /etc/crontab
     echo -e "$green已成功开启ddns！$plain"
 }
@@ -192,14 +192,14 @@ check_state(){
     installed=1 #1已安装，但未启用
     if [ "${release}" == "centos" ]; then
         #设置开机启动脚本
-        cat /etc/rc.local|grep "bash $SH_FILE ALL" 
+        cat /etc/rc.local|grep -q "bash $SH_FILE ALL" 
         [ "$?" != "0" ]&& echo -e "$green已安装，但$red 尚未启用，建议执行安装$plain" &&return 0
 	elif [ "${release}" == "ubuntu" -o "${release}" == "debian"  ]; then
         #设置开机启动脚本
-        cat /etc/network/if-pre-up.d/iptables|grep "bash $SH_FILE ALL" 
+        cat /etc/network/if-pre-up.d/iptables|grep -q "bash $SH_FILE ALL" 
 		[ "$?" != "0" ]&& echo -e "$green已安装，但$red 尚未启用，建议执行安装$plain" &&return 0
 	fi
-    cat /etc/crontab|grep "root  bash $SH_FILE &> /dev/null" 
+    cat /etc/crontab|grep -q "root  bash $SH_FILE &> /dev/null" 
     #2已安装，但未启用DDNS
 	[ "$?" != "0" ]&& echo -e "$green已安装，但未启用DDNS，可在高级设置里设置启用DDNS$plain" && installed=2 &&return 0
     echo -e "$green已安装，且已启用DDNS$plain"
@@ -280,9 +280,9 @@ add_SIP(){
 	[[ -z "${localPort}" ]] && local_port="${remotePort}"
 	echo && echo -e "	本地监听端口 : ${red}${localPort}${plain}" && echo
     #检查本地配置中端口是否已占用
-    result=`cat $CONF_FILE|grep -E "^SIP:$localPort"`
+    result=`cat $CONF_FILE|grep -E -q "^SIP:$localPort"`
     [ -n $result ]&&echo -e "$red该本地端口已被静态IP转发占用，请重新设置！$plain"&&exit 1
-    result=`cat $CONF_FILE|grep -E "^DDNS:$localPort"`
+    result=`cat $CONF_FILE|grep -E -q "^DDNS:$localPort"`
     [ -n $result ]&&echo -e "$red该本地端口已被DDNS转发占用，请重新设置！$plain"&&exit 1
     #获取本地IP
     local_IP=$(cat $CONF_FILE|sed -n "s/^localIP://p")
@@ -317,9 +317,9 @@ add_DDNS(){
 	[[ -z "${localPort}" ]] && local_port="${remotePort}"
 	echo && echo -e "	本地监听端口 : ${red}${localPort}${plain}" && echo
     #检查本地配置中端口是否已占用
-    result=`cat $CONF_FILE|grep -E "^SIP:$localPort"`
+    result=`cat $CONF_FILE|grep -E -q "^SIP:$localPort"`
     [ -n $result ]&&echo -e "$red该本地端口已被静态IP转发占用，请重新设置！$plain"&&exit 1
-    result=`cat $CONF_FILE|grep -E "^DDNS:$localPort"`
+    result=`cat $CONF_FILE|grep -E -q "^DDNS:$localPort"`
     [ -n $result ]&&echo -e "$red该本地端口已被DDNS转发占用，请重新设置！$plain"&&exit 1
     #获取本地IP
     local_IP=$(cat $CONF_FILE|sed -n "s/^localIP://p")
