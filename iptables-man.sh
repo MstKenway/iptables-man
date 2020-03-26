@@ -145,7 +145,7 @@ sys_install(){
     [ ! -f $SH_FILE ] && echo "管理脚本下载失败！"&&exit 1
     #设置开机启动脚本
     cat /etc/rc.local|grep -q "exit"
-    if [ "$?"!= "0" ];then
+    if [ "$?" != "0" ];then
         echo "bash $SH_FILE ALL" >>/etc/rc.local
     else
         cat /etc/rc.local|grep -q "bash $SH_FILE ALL"
