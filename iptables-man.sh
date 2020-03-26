@@ -267,11 +267,13 @@ add_iptables(){
 add_SIP(){
     [ $installed -le 1 ]&&echo -e "$red脚本尚未安装或安装不完整！请重新安装后添加端口转发$plain"&&exit 1
     #设置远程端口
-    read -e -p "请输入 iptables 欲转发至的 $red远程端口$plain [1-65535] (被转发服务器):" remotePort
+    echo -e -n "请输入 iptables 欲转发至的 $red远程端口$plain [1-65535] (被转发服务器):"
+    read remotePort
 	[[ -z "${remotePort}" ]] && echo "取消..." && exit 1
 	echo && echo -e "	欲转发端口 : ${red}${remotePort}${plain}" && echo
     #设置远程IP
-    read -e -p "请输入 iptables 欲转发至的 $red远程IP$plain (被转发服务器):" remoteIP
+    echo -e -n "请输入 iptables 欲转发至的 $red远程IP$plain (被转发服务器):" 
+    echo remoteIP
     [[ -z "${remoteIP}" ]] && echo "取消..." && exit 1
     echo && echo -e "	欲转发服务器IP : ${red}${remoteIP}${plain}" && echo
     #设置本地端口
@@ -280,10 +282,10 @@ add_SIP(){
 	[[ -z "${localPort}" ]] && local_port="${remotePort}"
 	echo && echo -e "	本地监听端口 : ${red}${localPort}${plain}" && echo
     #检查本地配置中端口是否已占用
-    result=`cat $CONF_FILE|grep -E -q "^SIP:$localPort"`
-    [ -n $result ]&&echo -e "$red该本地端口已被静态IP转发占用，请重新设置！$plain"&&exit 1
-    result=`cat $CONF_FILE|grep -E -q "^DDNS:$localPort"`
-    [ -n $result ]&&echo -e "$red该本地端口已被DDNS转发占用，请重新设置！$plain"&&exit 1
+    result=`cat $CONF_FILE|grep -E "^SIP:$localPort"`
+    [ -n "$result" ]&&echo -e "$red该本地端口已被静态IP转发占用，请重新设置！$plain"&&exit 1
+    result=`cat $CONF_FILE|grep -E "^DDNS:$localPort"`
+    [ -n "$result" ]&&echo -e "$red该本地端口已被DDNS转发占用，请重新设置！$plain"&&exit 1
     #获取本地IP
     local_IP=$(cat $CONF_FILE|sed -n "s/^localIP://p")
     [ -z $local_IP ]&& echo -e "$red本地IP出错！请重新设置本地IP！$plain"
@@ -301,11 +303,13 @@ add_SIP(){
 add_DDNS(){
     [ $installed -le 2 ]&&echo -e "$red脚本尚未安装或安装不完整！请重新安装并开启DDNS后添加端口转发$plain"&&exit 1
     #设置远程端口
-    read -e -p "请输入 iptables 欲转发至的 $red远程端口$plain [1-65535] (被转发服务器):" remotePort
+    echo -e -n "请输入 iptables 欲转发至的 $red远程端口$plain [1-65535] (被转发服务器):"
+    read  remotePort
 	[[ -z "${remotePort}" ]] && echo "取消..." && exit 1
 	echo && echo -e "	欲转发端口 : ${red}${remotePort}${plain}" && echo
     #设置DDNS
-    read -e -p "请输入 iptables 欲转发至的 ${red}DDNS${plain} (被转发服务器):" DDNS
+    echo -e -n "请输入 iptables 欲转发至的 ${red}DDNS${plain} (被转发服务器):"
+    read DDNS
     [[ -z "${DDNS}" ]] && echo "取消..." && exit 1
     echo && echo -e "	欲转发的DDNS : ${red}${DDNS}${plain}" && echo
     #检测DDNS是否有效
@@ -313,14 +317,14 @@ add_DDNS(){
     [ -z "$remoteIP" ] && echo "Err： $ddns 解析失败！请检查DDNS以及解析工具HOST" && exit 1
     #设置本地端口
     echo -e "请输入 iptables $red本地监听端口$plain [1-65535] "
-	read -e -p "(默认端口: ${remotePort}):" localPort
+	read -p "(默认端口: ${remotePort}):" localPort
 	[[ -z "${localPort}" ]] && local_port="${remotePort}"
 	echo && echo -e "	本地监听端口 : ${red}${localPort}${plain}" && echo
     #检查本地配置中端口是否已占用
-    result=`cat $CONF_FILE|grep -E -q "^SIP:$localPort"`
-    [ -n $result ]&&echo -e "$red该本地端口已被静态IP转发占用，请重新设置！$plain"&&exit 1
-    result=`cat $CONF_FILE|grep -E -q "^DDNS:$localPort"`
-    [ -n $result ]&&echo -e "$red该本地端口已被DDNS转发占用，请重新设置！$plain"&&exit 1
+    result=`cat $CONF_FILE|grep -E "^SIP:$localPort"`
+    [ -n "$result" ]&&echo -e "$red该本地端口已被静态IP转发占用，请重新设置！$plain"&&exit 1
+    result=`cat $CONF_FILE|grep -E "^DDNS:$localPort"`
+    [ -n "$result" ]&&echo -e "$red该本地端口已被DDNS转发占用，请重新设置！$plain"&&exit 1
     #获取本地IP
     local_IP=$(cat $CONF_FILE|sed -n "s/^localIP://p")
     [ -z $local_IP ]&& echo -e "$red本地IP出错！请重新设置本地IP！$plain"
