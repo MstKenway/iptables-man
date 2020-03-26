@@ -325,7 +325,7 @@ add_DDNS(){
     local_IP=$(cat $CONF_FILE|sed -n "s/^localIP://p")
     [ -z $local_IP ]&& echo -e "$red本地IP出错！请重新设置本地IP！$plain"
     add_iptables $localPort $remoteIP $remotePort
-    echo -e "SIP:$localPort:$DDNS:$remotePort">>$CONF_FILE
+    echo -e "DDNS:$localPort:$DDNS:$remoteIP:$remotePort">>$CONF_FILE
     echo -e "$green端口转发设置已成功！$plain"
     echo -e "本地IP：${green}${local_IP}${plain}"
     echo -e "本地端口：${green}${localPort}${plain}"
@@ -344,9 +344,10 @@ del_port(){
         read -p "请输入您想删除的端口：(默认为取消)" port 
         [ -z $port ]&& break
         del_port $port
+        sed -i "/^SIP:$port/d" $CONF_FILE
+        sed -i "/^DDNS:$port/d" $CONF_FILE
         echo -e "本地端口：${red}${port}${plain}已删除完毕"
     done
-
 }
 
 resetting_port(){
