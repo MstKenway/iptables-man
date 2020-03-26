@@ -192,15 +192,15 @@ check_state(){
     [ ! -f $SH_FILE ]&& echo -e "$red 尚未安装！$plain" &&return 0
     [ ! -f $CONF_FILE ]&& echo -e "$red 尚未安装！$plain" &&return 0
     installed=1 #1已安装，但未启用
-    if [ "${release}" == "centos" ]; then
+    # if [ "${release}" == "centos" ]; then
         #设置开机启动脚本
         cat /etc/rc.local|grep -q "bash $SH_FILE ALL" 
         [ "$?" != "0" ]&& echo -e "$green已安装，但$red 尚未启用，建议执行安装$plain" &&return 0
-	elif [ "${release}" == "ubuntu" -o "${release}" == "debian"  ]; then
+	# elif [ "${release}" == "ubuntu" -o "${release}" == "debian"  ]; then
         #设置开机启动脚本
-        cat /etc/network/if-pre-up.d/iptables|grep -q "bash $SH_FILE ALL" 
-		[ "$?" != "0" ]&& echo -e "$green已安装，但$red 尚未启用，建议执行安装$plain" &&return 0
-	fi
+        # cat /etc/network/if-pre-up.d/iptables|grep -q "bash $SH_FILE ALL" 
+		# [ "$?" != "0" ]&& echo -e "$green已安装，但$red 尚未启用，建议执行安装$plain" &&return 0
+	# fi
     cat /etc/crontab|grep -q "root  bash $SH_FILE &> /dev/null" 
     #2已安装，但未启用DDNS
 	[ "$?" != "0" ]&& echo -e "$green已安装，但未启用DDNS，可在高级设置里设置启用DDNS$plain" && installed=2 &&return 0
