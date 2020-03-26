@@ -343,7 +343,7 @@ del_port(){
         cat $CONF_FILE|grep -v "localIP"|sort -n -t:
         read -p "请输入您想删除的端口：(默认为取消)" port 
         [ -z $port ]&& break
-        del_port $port
+        del_iptables $port
         sed -i "/^SIP:$port/d" $CONF_FILE
         sed -i "/^DDNS:$port/d" $CONF_FILE
         echo -e "本地端口：${red}${port}${plain}已删除完毕"
