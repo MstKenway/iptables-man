@@ -2,7 +2,9 @@
 A script for forwarding by iptables[DDNS support]
 基于iptables的端口转发脚本
 
-支持DDNS转发和静态IP转发
+支持DDNS转发和静态IP转发，且重启后不会丢失规则
+
+目前不支持端口段转发
 
 目前尚在测试中，有BUG欢迎发issue
 
