@@ -144,13 +144,13 @@ sys_install(){
     [ ! -f $SH_FILE ]&& wget --no-check-certificate https://raw.githubusercontent.com/MstKenway/iptables-man/master/iptables-ddns.sh -O $SH_FILE&& chmod +x $SH_FILE
     [ ! -f $SH_FILE ] && echo "管理脚本下载失败！"&&exit 1
     #设置开机启动脚本
-     if [ "${release}" == "centos" ]; then
+    #  if [ "${release}" == "centos" ]; then
         sed -i "/exit/i\bash $SH_FILE ALL" /etc/rc.local
         chmod +x /etc/rc.local
-	elif [ "${release}" == "ubuntu" -o "${release}" == "debian"  ]; then
-        echo -e "#!/bin/bash\nbash $SH_FILE ALL" > /etc/network/if-pre-up.d/iptables
-		chmod +x /etc/network/if-pre-up.d/iptables
-	fi
+	# elif [ "${release}" == "ubuntu" -o "${release}" == "debian"  ]; then
+        # echo -e "#!/bin/bash\nbash $SH_FILE ALL" > /etc/network/if-pre-up.d/iptables
+		# chmod +x /etc/network/if-pre-up.d/iptables
+	# fi
     #询问是否开启ddns
     read -p "是否启用ddns？y/n（默认为n，不启用）" input
     [ "$input" == "y" -o "$input" == "Y" ] && enable_ddns
@@ -168,13 +168,13 @@ sys_uninstall(){
     if [[ ${unyn} == [Yy] ]]; then
         rm -rf $CONF_DIR
         disable_ddns
-        if [ "${release}" == "centos" ]; then
+        # if [ "${release}" == "centos" ]; then
             #关闭开机启动脚本
             sed -i "/`basename $SH_FILE` ALL/d" /etc/rc.local
-        elif [ "${release}" == "ubuntu" -o "${release}" == "debian"  ]; then
+        # elif [ "${release}" == "ubuntu" -o "${release}" == "debian"  ]; then
             #关闭开机启动脚本
-            rm -f /etc/network/if-pre-up.d/iptables
-        fi
+            # rm -f /etc/network/if-pre-up.d/iptables
+        # fi
         echo -e "iptables端口转发脚本已卸载，感谢您的使用"
     fi
 }
