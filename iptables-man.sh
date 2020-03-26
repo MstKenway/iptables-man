@@ -144,18 +144,13 @@ sys_install(){
     [ ! -f $SH_FILE ]&& wget --no-check-certificate https://raw.githubusercontent.com/MstKenway/iptables-man/master/iptables-ddns.sh -O $SH_FILE&& chmod +x $SH_FILE
     [ ! -f $SH_FILE ] && echo "管理脚本下载失败！"&&exit 1
     #设置开机启动脚本
-    #  if [ "${release}" == "centos" ]; then
-        sed -i "/exit/i\bash $SH_FILE ALL" /etc/rc.local
-        chmod +x /etc/rc.local
-	# elif [ "${release}" == "ubuntu" -o "${release}" == "debian"  ]; then
-        # echo -e "#!/bin/bash\nbash $SH_FILE ALL" > /etc/network/if-pre-up.d/iptables
-		# chmod +x /etc/network/if-pre-up.d/iptables
-	# fi
+    cat /etc/rc.local|grep -q "bash $SH_FILE ALL"
+    [ "$?" != "0" ]&& sed -i "/exit/i\bash $SH_FILE ALL" /etc/rc.local
+    chmod +x /etc/rc.local
     #询问是否开启ddns
     read -p "是否启用ddns？y/n（默认为n，不启用）" input
     [ "$input" == "y" -o "$input" == "Y" ] && enable_ddns
     echo 
-    echo
     echo -e "${green}iptables端口转发脚本已成功安装！$plain"
 }
 
@@ -168,13 +163,8 @@ sys_uninstall(){
     if [[ ${unyn} == [Yy] ]]; then
         rm -rf $CONF_DIR
         disable_ddns
-        # if [ "${release}" == "centos" ]; then
-            #关闭开机启动脚本
-            sed -i "/`basename $SH_FILE` ALL/d" /etc/rc.local
-        # elif [ "${release}" == "ubuntu" -o "${release}" == "debian"  ]; then
-            #关闭开机启动脚本
-            # rm -f /etc/network/if-pre-up.d/iptables
-        # fi
+        #关闭开机启动脚本
+        sed -i "/`basename $SH_FILE` ALL/d" /etc/rc.local
         echo -e "iptables端口转发脚本已卸载，感谢您的使用"
     fi
 }
@@ -191,16 +181,11 @@ check_state(){
     [ ! -d $CONF_DIR ]&& echo -e "$red 尚未安装！$plain" &&return 0
     [ ! -f $SH_FILE ]&& echo -e "$red 尚未安装！$plain" &&return 0
     [ ! -f $CONF_FILE ]&& echo -e "$red 尚未安装！$plain" &&return 0
-    installed=1 #1已安装，但未启用
-    # if [ "${release}" == "centos" ]; then
-        #设置开机启动脚本
-        cat /etc/rc.local|grep -q "bash $SH_FILE ALL" 
-        [ "$?" != "0" ]&& echo -e "$green已安装，但$red 尚未启用，建议执行安装$plain" &&return 0
-	# elif [ "${release}" == "ubuntu" -o "${release}" == "debian"  ]; then
-        #设置开机启动脚本
-        # cat /etc/network/if-pre-up.d/iptables|grep -q "bash $SH_FILE ALL" 
-		# [ "$?" != "0" ]&& echo -e "$green已安装，但$red 尚未启用，建议执行安装$plain" &&return 0
-	# fi
+    #1已安装，但未启用
+    installed=1 
+    #检查开机启动脚本
+    cat /etc/rc.local|grep -q "bash $SH_FILE ALL" 
+    [ "$?" != "0" ]&& echo -e "$green已下载管理脚本，但$red 尚未启用，建议执行安装$plain" &&return 0
     cat /etc/crontab|grep -q "root  bash $SH_FILE &> /dev/null" 
     #2已安装，但未启用DDNS
 	[ "$?" != "0" ]&& echo -e "$green已安装，但未启用DDNS，可在高级设置里设置启用DDNS$plain" && installed=2 &&return 0
