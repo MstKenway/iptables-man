@@ -42,7 +42,7 @@ check_sys(){
 
 #获取本机ip
 get_localIP(){
-    localIP=$( ip -o -4 addr list eth0 |grep -v inet6|grep inet | sed -n 's/^.*inet //p'|sed -n 's/\/.*$//gp' )
+    localIP=$( ip -o -4 addr list |grep -v inet6|grep -v " lo "|grep inet | sed -n 's/^.*inet //p'|sed -n 's/\/.*$//gp'|head -1 )
     echo -e -n "请检查您本机IP（不一定是公网IP）是否是：$red $localIP $plain?"
     read  -p '请输入[y/n]（默认是y）' input 
     [ "$input" == "y" -o "$input" == "Y" -o "$input" == "" ]  &&return 0
