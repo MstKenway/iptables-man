@@ -1,7 +1,7 @@
 # iptables-man
 A script for forwarding by iptables[DDNS support]
 基于iptables的端口转发脚本
-
+version1.0.1
 支持Centos7+/Debian/Ubuntu
 
 支持DDNS转发和静态IP转发，且重启后不会丢失规则
