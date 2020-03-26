@@ -273,7 +273,7 @@ add_SIP(){
 	echo && echo -e "	欲转发端口 : ${red}${remotePort}${plain}" && echo
     #设置远程IP
     echo -e -n "请输入 iptables 欲转发至的 $red远程IP$plain (被转发服务器):" 
-    echo remoteIP
+    read remoteIP
     [[ -z "${remoteIP}" ]] && echo "取消..." && exit 1
     echo && echo -e "	欲转发服务器IP : ${red}${remoteIP}${plain}" && echo
     #设置本地端口
@@ -313,7 +313,7 @@ add_DDNS(){
     [[ -z "${DDNS}" ]] && echo "取消..." && exit 1
     echo && echo -e "	欲转发的DDNS : ${red}${DDNS}${plain}" && echo
     #检测DDNS是否有效
-    remoteIP=`$(host -t a $ddns|sed -n 's/^.*ss //p'|head -1)`
+    remoteIP=$(host -t a $DDNS|sed -n 's/^.*ss //p'|head -1)
     [ -z "$remoteIP" ] && echo "Err： $ddns 解析失败！请检查DDNS以及解析工具HOST" && exit 1
     #设置本地端口
     echo -e "请输入 iptables $red本地监听端口$plain [1-65535] "
