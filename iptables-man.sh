@@ -42,16 +42,16 @@ check_sys(){
 
 #获取本机ip
 get_localIP(){
-    local localIP=$( ip -o -4 addr list eth0 |grep -v inet6|grep inet | sed -n 's/^.*inet //p'|sed -n 's/\/.*$//gp' )
+    localIP=$( ip -o -4 addr list eth0 |grep -v inet6|grep inet | sed -n 's/^.*inet //p'|sed -n 's/\/.*$//gp' )
     echo -e -n "请检查您本机IP（不一定是公网IP）是否是：$red $localIP $plain?"
-    read  -p '请输入y/n（默认是y）' input 
-    [ "$input" == "y" -o "$input" == "Y" -o "$input" == "" ] && echo $localIP &&return 0
+    read  -p '请输入[y/n]（默认是y）' input 
+    [ "$input" == "y" -o "$input" == "Y" -o "$input" == "" ]  &&return 0
     read -p "请输入您本机IP： " input
     until echo $input|grep -E -q "^[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$"
     do 
         read -p "请正确输入您本机IP： " input
     done
-    echo $input
+    localIP=$input
 }
 #设置iptables
 Set_iptables(){
@@ -116,8 +116,10 @@ sys_install(){
     echo -e "$green正在安装依赖bind-uitls，用于查询dns$plain"
     if [ "${release}" == "centos" ]; then
         yum install bind-utils -y &> /dev/null
+        yum install wget -y &> /dev/null
 	elif [ "${release}" == "ubuntu" -o "${release}" == "debian"  ]; then
         apt install -y dnsutils &> /dev/null
+        apt install -y wget &> /dev/null
 	fi
     #检查目录是否存在
     [ ! -d $CONF_DIR ] && mkdir $CONF_DIR
@@ -126,16 +128,16 @@ sys_install(){
     then
         cat $CONF_FILE|grep -q localIP
         #文档里不存在localIP则直接添加
-        [ "$?" != "0" ] && local localIP=$(get_localIP) && echo "localIP:$localIP">>$CONF_FILE 
+        [ "$?" != "0" ] && get_localIP && echo "localIP:$localIP">>$CONF_FILE 
 
         cat $CONF_FILE|sed -n '/^localIP:[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$/p'|grep -q localIP
         if [ "$?" != "0" ];then
-            local localIP=$(get_localIP)
+            get_localIP
             #文档里存在localIP但格式不正确，重新覆盖
             sed -i "s/^localIP:.*$/localIP:$localIP/g" $CONF_FILE 
         fi
     else
-        local localIP=$(get_localIP)
+        get_localIP
         echo "localIP:$localIP">$CONF_FILE
     fi
     #检查本机管理脚本是否下载
@@ -159,18 +161,18 @@ sys_install(){
 
 #卸载管理脚本
 sys_uninstall(){
-    [ $installed -lt 1 ]&& echo -e "$red脚本尚未安装！请先安装！$plain"&exit 1
+    [ $installed -lt 1 ]&& echo -e "$red脚本尚未安装！请先安装！$plain"&&exit 1
     echo -e "确定要删除iptables管理脚本 ? [y/N]"
 	read -e -p "(默认: n):" unyn
+    [[ -z ${unyn} ]] && unyn="n"
     if [[ ${unyn} == [Yy] ]]; then
-        [[ -z ${unyn} ]] && unyn="n"
         rm -rf $CONF_DIR
         disable_ddns
         if [ "${release}" == "centos" ]; then
-            #设置开机启动脚本
-            sed -i "/bash $SH_FILE ALL/d" /etc/rc.local
+            #关闭开机启动脚本
+            sed -i "/`basename $SH_FILE` ALL/d" /etc/rc.local
         elif [ "${release}" == "ubuntu" -o "${release}" == "debian"  ]; then
-            #设置开机启动脚本
+            #关闭开机启动脚本
             rm -f /etc/network/if-pre-up.d/iptables
         fi
         echo -e "iptables端口转发脚本已卸载，感谢您的使用"
@@ -359,6 +361,7 @@ resetting_port(){
 }
 
 advanced_setting(){
+
 echo && echo -e " iptables 端口转发一键管理脚本高级设置
 ————————————
  ${green}1.${plain} 启用DDNS
