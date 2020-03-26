@@ -11,3 +11,7 @@ A script for forwarding by iptables[DDNS support]
 ```
 wget --no-check-certificate https://github.com/MstKenway/iptables-man/raw/master/iptables-man.sh && chmod +x iptables-man.sh&&./iptables-man.sh 
 ```
+或者
+```
+curl -O https://github.com/MstKenway/iptables-man/raw/master/iptables-man.sh && chmod +x iptables-man.sh&&./iptables-man.sh 
+```
