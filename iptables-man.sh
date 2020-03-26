@@ -56,7 +56,7 @@ get_localIP(){
 #设置iptables
 Set_iptables(){
     cat /etc/sysctl.conf|grep -E -q "^[^#]*net.ipv4.ip_forward=1"
-	[ "$?" != "0"] &&echo -e "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+	[ "$?" != "0" ] &&echo -e "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
 	sysctl -p
     #关闭防火墙
 	if [[ ${release} == "centos" ]]; then
@@ -113,7 +113,7 @@ sys_install(){
     #检查并安装配置iptables 
     install_iptables
     #安装依赖
-    echo -e "$green 正在安装依赖bind-uitls，用于查询dns$plain"
+    echo -e "$green正在安装依赖bind-uitls，用于查询dns$plain"
     if [ "${release}" == "centos" ]; then
         yum install bind-utils -y &> /dev/null
 	elif [ "${release}" == "ubuntu" -o "${release}" == "debian"  ]; then
@@ -124,11 +124,11 @@ sys_install(){
     #检查是否含有本机ip地址
     if [ -f $CONF_FILE ]
     then
-        cat $CONF_FILE|grep localIP
+        cat $CONF_FILE|grep -q localIP
         #文档里不存在localIP则直接添加
         [ "$?" != "0" ] && local localIP=$(get_localIP) && echo "localIP:$localIP">>$CONF_FILE 
 
-        cat $CONF_FILE|sed -n '/^localIP:[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$/p'|grep localIP
+        cat $CONF_FILE|sed -n '/^localIP:[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$/p'|grep -q localIP
         if [ "$?" != "0" ];then
             local localIP=$(get_localIP)
             #文档里存在localIP但格式不正确，重新覆盖
