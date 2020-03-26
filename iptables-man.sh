@@ -5,10 +5,10 @@ export PATH
 #=================================================
 #	System Required: CentOS/Debian/Ubuntu
 #	Description: iptables Port forwarding Management
-#	Version: 1.0.2
+#	Version: 1.0.3
 #	Author: Kenway
 #=================================================
-sh_ver="1.0.2"
+sh_ver="1.0.3"
 
 
 
@@ -271,7 +271,7 @@ add_SIP(){
     #设置本地端口
     echo -e "请输入 iptables $red本地监听端口$plain [1-65535] "
 	read -e -p "(默认端口: ${remotePort}):" localPort
-	[[ -z "${localPort}" ]] && local_port="${remotePort}"
+	[[ -z "${localPort}" ]] && localPort="${remotePort}"
 	echo && echo -e "	本地监听端口 : ${red}${localPort}${plain}" && echo
     #检查本地配置中端口是否已占用
     result=`cat $CONF_FILE|grep -E "^SIP:$localPort"`
@@ -310,7 +310,7 @@ add_DDNS(){
     #设置本地端口
     echo -e "请输入 iptables $red本地监听端口$plain [1-65535] "
 	read -p "(默认端口: ${remotePort}):" localPort
-	[[ -z "${localPort}" ]] && local_port="${remotePort}"
+	[[ -z "${localPort}" ]] && localPort="${remotePort}"
 	echo && echo -e "	本地监听端口 : ${red}${localPort}${plain}" && echo
     #检查本地配置中端口是否已占用
     result=`cat $CONF_FILE|grep -E "^SIP:$localPort"`
