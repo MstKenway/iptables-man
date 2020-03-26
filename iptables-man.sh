@@ -5,10 +5,10 @@ export PATH
 #=================================================
 #	System Required: CentOS/Debian/Ubuntu
 #	Description: iptables Port forwarding Management
-#	Version: 1.0.0
+#	Version: 1.0.2
 #	Author: Kenway
 #=================================================
-sh_ver="1.0.0"
+sh_ver="1.0.2"
 
 
 
@@ -144,9 +144,14 @@ sys_install(){
     [ ! -f $SH_FILE ]&& wget --no-check-certificate https://raw.githubusercontent.com/MstKenway/iptables-man/master/iptables-ddns.sh -O $SH_FILE&& chmod +x $SH_FILE
     [ ! -f $SH_FILE ] && echo "管理脚本下载失败！"&&exit 1
     #设置开机启动脚本
-    cat /etc/rc.local|grep -q "bash $SH_FILE ALL"
-    [ "$?" != "0" ]&& sed -i "/exit/i\bash $SH_FILE ALL" /etc/rc.local
-    chmod +x /etc/rc.local
+    cat /etc/rc.local|grep -q "exit"
+    if [ "$?"!= "0" ];then
+        echo "bash $SH_FILE ALL" >>/etc/rc.local
+    else
+        cat /etc/rc.local|grep -q "bash $SH_FILE ALL"
+        [ "$?" != "0" ]&& sed -i "/exit/i\bash $SH_FILE ALL" /etc/rc.local
+        chmod +x /etc/rc.local
+    fi
     #询问是否开启ddns
     read -p "是否启用ddns？y/n（默认为n，不启用）" input
     [ "$input" == "y" -o "$input" == "Y" ] && enable_ddns
