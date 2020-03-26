@@ -8,4 +8,4 @@ A script for forwarding by iptables[DDNS support]
 
 使用方式：
 
-·wget --no-check-certificate https://github.com/MstKenway/iptables-man/raw/master/iptables-man.sh && chmod +x iptables-man.sh&&./iptables-man.sh·
+`wget --no-check-certificate https://github.com/MstKenway/iptables-man/raw/master/iptables-man.sh && chmod +x iptables-man.sh&&./iptables-man.sh`
