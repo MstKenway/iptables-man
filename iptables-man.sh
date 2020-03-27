@@ -5,10 +5,10 @@ export PATH
 #=================================================
 #	System Required: CentOS/Debian/Ubuntu
 #	Description: iptables Port forwarding Management
-#	Version: 1.0.3
+#	Version: 1.0.4
 #	Author: Kenway
 #=================================================
-sh_ver="1.0.3"
+sh_ver="1.0.4"
 
 
 
@@ -146,7 +146,8 @@ sys_install(){
     #设置开机启动脚本
     cat /etc/rc.local|grep -q "exit"
     if [ "$?" != "0" ];then
-        echo "bash $SH_FILE ALL" >>/etc/rc.local
+        cat /etc/rc.local|grep -q "bash $SH_FILE ALL"
+        [ "$?" != "0" ]&&echo "bash $SH_FILE ALL" >>/etc/rc.local
     else
         cat /etc/rc.local|grep -q "bash $SH_FILE ALL"
         [ "$?" != "0" ]&& sed -i "/exit/i\bash $SH_FILE ALL" /etc/rc.local
