@@ -29,3 +29,5 @@ localIP:本机IP
 SIP:本地端口:远端IP:远端端口
 DDNS:本地端口:DDNS:原解析IP:远端端口
 ```
+---
+感谢iptablesUtils&iptables-pf，参考借鉴不少
