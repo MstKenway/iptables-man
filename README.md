@@ -2,7 +2,7 @@
 A script for forwarding by iptables[DDNS support]
 基于iptables的端口转发脚本
 
-version1.0.3
+version1.0.4
 
 支持Centos7+/Debian/Ubuntu
 
