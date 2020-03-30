@@ -5,10 +5,10 @@ export PATH
 #=================================================
 #	System Required: CentOS/Debian/Ubuntu
 #	Description: iptables Port forwarding Management
-#	Version: 1.0.5
+#	Version: 1.0.6
 #	Author: Kenway
 #=================================================
-sh_ver="1.0.5"
+sh_ver="1.0.6"
 
 
 
@@ -16,7 +16,7 @@ sh_ver="1.0.5"
 CONF_DIR="/etc/iptables-man"
 CONF_FILE=$CONF_DIR/iptables.conf
 SH_FILE=$CONF_DIR/iptables-ddns.sh
-SRV_FILE=/usr/lib/systemd/system/iptables-man.service
+SRV_FILE=/etc/systemd/system/iptables-man.service
 #字体颜色
 red="\033[31m"
 green="\033[32m"
