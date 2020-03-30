@@ -5,10 +5,10 @@ export PATH
 #=================================================
 #	System Required: CentOS/Debian/Ubuntu
 #	Description: iptables Port forwarding Management
-#	Version: 1.0.4
+#	Version: 1.0.5
 #	Author: Kenway
 #=================================================
-sh_ver="1.0.4"
+sh_ver="1.0.5"
 
 
 
@@ -16,6 +16,7 @@ sh_ver="1.0.4"
 CONF_DIR="/etc/iptables-man"
 CONF_FILE=$CONF_DIR/iptables.conf
 SH_FILE=$CONF_DIR/iptables-ddns.sh
+SRV_FILE=/usr/lib/systemd/system/iptables-man.service
 #字体颜色
 red="\033[31m"
 green="\033[32m"
@@ -144,15 +145,21 @@ sys_install(){
     [ ! -f $SH_FILE ]&& wget --no-check-certificate https://raw.githubusercontent.com/MstKenway/iptables-man/master/iptables-ddns.sh -O $SH_FILE&& chmod +x $SH_FILE
     [ ! -f $SH_FILE ] && echo "管理脚本下载失败！"&&exit 1
     #设置开机启动脚本
-    cat /etc/rc.local|grep -q "exit"
-    if [ "$?" != "0" ];then
-        cat /etc/rc.local|grep -q "bash $SH_FILE ALL"
-        [ "$?" != "0" ]&&echo "bash $SH_FILE ALL" >>/etc/rc.local
-    else
-        cat /etc/rc.local|grep -q "bash $SH_FILE ALL"
-        [ "$?" != "0" ]&& sed -i "/exit/i\bash $SH_FILE ALL" /etc/rc.local
-        chmod +x /etc/rc.local
-    fi
+    [ ! -f $SRV_FILE ] && cat >$SRV_FILE << EOF
+[Unit]
+Description=iptables management for forwarding
+After=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=
+ExecStart=/etc/iptables-man/iptables-ddns.sh ALL
+
+[Install]
+WantedBy=multi-user.target
+EOF
+    systemctl daemon-reload
+    systemctl enable iptables-man.service
     #询问是否开启ddns
     read -p "是否启用ddns？y/n（默认为n，不启用）" input
     [ "$input" == "y" -o "$input" == "Y" ] && enable_ddns
@@ -170,8 +177,9 @@ sys_uninstall(){
         rm -rf $CONF_DIR
         disable_ddns
         #关闭开机启动脚本
-        sed -i "/`basename $SH_FILE` ALL/d" /etc/rc.local
-        echo -e "iptables端口转发脚本已卸载，感谢您的使用"
+        systemctl stop iptables-man.service
+        systemctl disable iptables-man.service
+        [ -f $SRV_FILE ] && rm -f $SRV_FILE && rm -rf /etc/systemd/system/iptables-man.*
     fi
 }
 #高级设置
@@ -190,8 +198,7 @@ check_state(){
     #1已安装，但未启用
     installed=1 
     #检查开机启动脚本
-    cat /etc/rc.local|grep -q "bash $SH_FILE ALL" 
-    [ "$?" != "0" ]&& echo -e "$green已下载管理脚本，但$red 尚未启用，建议执行安装$plain" &&return 0
+    [ ! -f $SRV_FILE ]&& echo -e "$green已下载管理脚本，但$red 尚未启用，建议执行安装$plain" &&return 0
     cat /etc/crontab|grep -q "root  bash $SH_FILE &> /dev/null" 
     #2已安装，但未启用DDNS
 	[ "$?" != "0" ]&& echo -e "$green已安装，但未启用DDNS，可在高级设置里设置启用DDNS$plain" && installed=2 &&return 0
