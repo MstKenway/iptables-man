@@ -12,6 +12,8 @@ version1.0.4
 
 目前尚在测试中，有BUG欢迎发issue
 
+1.0.5自启方式改变，建议1.0.4以前的卸载后重新安装（记得备份配置文件）
+
 使用方式：
 
 ```
@@ -29,5 +31,15 @@ localIP:本机IP
 SIP:本地端口:远端IP:远端端口
 DDNS:本地端口:DDNS:原解析IP:远端端口
 ```
+
 ---
+
+对于1.0.4以前的版本请使用以下代码卸载，或重装系统
+```
+sed -i "/iptables-ddns/d"  /etc/rc.local
+```
+
+
+---
+
 感谢iptablesUtils&iptables-pf，参考借鉴不少
