@@ -345,7 +345,7 @@ del_port(){
     do
         #列出所有端口转发规则
         cat $CONF_FILE|grep -v "localIP"|sort -n -t:
-        read -p "请输入您想删除的端口：(默认为取消)" port 
+        read -e -p "请输入您想删除的端口：(默认为取消)" port 
         [ -z $port ]&& break
         del_iptables $port
         sed -i "/^SIP:${port}/d" $CONF_FILE
