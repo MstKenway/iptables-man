@@ -5,10 +5,10 @@ export PATH
 #=================================================
 #	System Required: CentOS/Debian/Ubuntu
 #	Description: iptables Port forwarding Management
-#	Version: 1.0.6
+#	Version: 1.0.7
 #	Author: Kenway
 #=================================================
-sh_ver="1.0.6"
+sh_ver="1.0.7"
 
 
 
@@ -44,13 +44,13 @@ check_sys(){
 #获取本机ip
 get_localIP(){
     localIP=$( ip -o -4 addr list |grep -v inet6|grep -v " lo "|grep inet | sed -n 's/^.*inet //p'|sed -n 's/\/.*$//gp'|head -1 )
-    echo -e -n "请检查您本机IP（不一定是公网IP）是否是：$red $localIP $plain?"
-    read  -p '请输入[y/n]（默认是y）' input 
+    echo -e -n "请检查您本机IP（不一定是公网IP）是否是：$red $localIP $plain?\n"
+    read -e -p '请输入[y/n]（默认是y）' input 
     [ "$input" == "y" -o "$input" == "Y" -o "$input" == "" ]  &&return 0
-    read -p "请输入您本机IP： " input
+    read -e -p "请输入您本机IP： " input
     until echo $input|grep -E -q "^[0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$"
     do 
-        read -p "请正确输入您本机IP： " input
+        read -e -p "请正确输入您本机IP： " input
     done
     localIP=$input
 }
@@ -98,7 +98,7 @@ install_iptables(){
 enable_ddns(){
     #向crontab添加定时执行脚本，默认2分钟执行一次
     cat /etc/crontab|grep -q $SH_FILE
-    [ "$?" != "0" ]&& echo "*/2  *  *  *  * root  bash $SH_FILE &> /dev/null" > /etc/crontab
+    [ "$?" != "0" ]&& echo "*/2  *  *  *  * root  bash $SH_FILE &> /dev/null" >> /etc/crontab
     echo -e "$green已成功开启ddns！$plain"
 }
 
@@ -114,7 +114,7 @@ sys_install(){
     #检查并安装配置iptables 
     install_iptables
     #安装依赖
-    echo -e "$green正在安装依赖bind-uitls，用于查询dns$plain"
+    echo -e "$green正在安装依赖库bind-utils，用于查询dns$plain"
     if [ "${release}" == "centos" ]; then
         yum install bind-utils -y &> /dev/null
         yum install wget -y &> /dev/null
@@ -161,7 +161,7 @@ EOF
     systemctl daemon-reload
     systemctl enable iptables-man.service
     #询问是否开启ddns
-    read -p "是否启用ddns？y/n（默认为n，不启用）" input
+    read -e -p "是否启用ddns？y/n（默认为n，不启用）" input
     [ "$input" == "y" -o "$input" == "Y" ] && enable_ddns
     echo 
     echo -e "${green}iptables端口转发脚本已成功安装！$plain"
@@ -265,20 +265,20 @@ add_iptables(){
 }
 #添加静态IP端口转发
 add_SIP(){
-    [ $installed -le 1 ]&&echo -e "$red脚本尚未安装或安装不完整！请重新安装后添加端口转发$plain"&&exit 1
+    [ $installed -le 1 ]&&echo -e "${red}脚本尚未安装或安装不完整！请重新安装后添加端口转发${plain}"&&exit 1
     #设置远程端口
-    echo -e -n "请输入 iptables 欲转发至的 $red远程端口$plain [1-65535] (被转发服务器):"
-    read remotePort
+    echo -e -n "请输入 iptables 欲转发至的 ${red}远程端口${plain} (被转发服务器)\n"
+    read -e -p "远端端口号[1-65535]: " remotePort
 	[[ -z "${remotePort}" ]] && echo "取消..." && exit 1
 	echo && echo -e "	欲转发端口 : ${red}${remotePort}${plain}" && echo
     #设置远程IP
-    echo -e -n "请输入 iptables 欲转发至的 $red远程IP$plain (被转发服务器):" 
-    read remoteIP
+    echo -e -n "请输入 iptables 欲转发至的 ${red}远程IP${plain} (被转发服务器):\n" 
+    read -e remoteIP
     [[ -z "${remoteIP}" ]] && echo "取消..." && exit 1
     echo && echo -e "	欲转发服务器IP : ${red}${remoteIP}${plain}" && echo
     #设置本地端口
-    echo -e "请输入 iptables $red本地监听端口$plain [1-65535] "
-	read -e -p "(默认端口: ${remotePort}):" localPort
+    echo -e "请输入 iptables $red本地监听端口$plain [1-65535]\n "
+	read -e -p "(默认本地端口: ${remotePort}):" localPort
 	[[ -z "${localPort}" ]] && localPort="${remotePort}"
 	echo && echo -e "	本地监听端口 : ${red}${localPort}${plain}" && echo
     #检查本地配置中端口是否已占用
@@ -303,21 +303,21 @@ add_SIP(){
 add_DDNS(){
     [ $installed -le 2 ]&&echo -e "$red脚本尚未安装或安装不完整！请重新安装并开启DDNS后添加端口转发$plain"&&exit 1
     #设置远程端口
-    echo -e -n "请输入 iptables 欲转发至的 $red远程端口$plain [1-65535] (被转发服务器):"
-    read  remotePort
+    echo -e -n "请输入 iptables 欲转发至的 ${red}远程端口${plain} (被转发服务器)\n"
+    read -e -p "远端端口号[1-65535]: " remotePort
 	[[ -z "${remotePort}" ]] && echo "取消..." && exit 1
 	echo && echo -e "	欲转发端口 : ${red}${remotePort}${plain}" && echo
     #设置DDNS
-    echo -e -n "请输入 iptables 欲转发至的 ${red}DDNS${plain} (被转发服务器):"
-    read DDNS
+    echo -e -n "请输入 iptables 欲转发至的 ${red}DDNS${plain} (被转发服务器):\n"
+    read -e DDNS
     [[ -z "${DDNS}" ]] && echo "取消..." && exit 1
     echo && echo -e "	欲转发的DDNS : ${red}${DDNS}${plain}" && echo
     #检测DDNS是否有效
     remoteIP=$(host -t a $DDNS|sed -n 's/^.*ss //p'|head -1)
     [ -z "$remoteIP" ] && echo "Err： $ddns 解析失败！请检查DDNS以及解析工具HOST" && exit 1
     #设置本地端口
-    echo -e "请输入 iptables $red本地监听端口$plain [1-65535] "
-	read -p "(默认端口: ${remotePort}):" localPort
+    echo -e "请输入 iptables $red本地监听端口$plain [1-65535]\n "
+	read -e -p "(默认端口: ${remotePort}):" localPort
 	[[ -z "${localPort}" ]] && localPort="${remotePort}"
 	echo && echo -e "	本地监听端口 : ${red}${localPort}${plain}" && echo
     #检查本地配置中端口是否已占用
@@ -328,9 +328,9 @@ add_DDNS(){
     #获取本地IP
     local_IP=$(cat $CONF_FILE|sed -n "s/^localIP://p")
     [ -z $local_IP ]&& echo -e "$red本地IP出错！请重新设置本地IP！$plain"
-    add_iptables $localPort $remoteIP $remotePort
-    echo -e "DDNS:$localPort:$DDNS:$remoteIP:$remotePort">>$CONF_FILE
-    echo -e "$green端口转发设置已成功！$plain"
+    add_iptables $localPort ${remoteIP} ${remotePort}
+    echo -e "DDNS:$localPort:$DDNS:$remoteIP:${remotePort}">>${CONF_FILE}
+    echo -e "${green}端口转发设置已成功！${plain}"
     echo -e "本地IP：${green}${local_IP}${plain}"
     echo -e "本地端口：${green}${localPort}${plain}"
     echo
@@ -348,14 +348,14 @@ del_port(){
         read -p "请输入您想删除的端口：(默认为取消)" port 
         [ -z $port ]&& break
         del_iptables $port
-        sed -i "/^SIP:$port/d" $CONF_FILE
-        sed -i "/^DDNS:$port/d" $CONF_FILE
+        sed -i "/^SIP:${port}/d" $CONF_FILE
+        sed -i "/^DDNS:${port}/d" $CONF_FILE
         echo -e "本地端口：${red}${port}${plain}已删除完毕"
     done
 }
 
 resetting_port(){
-    [ $installed -gt 2 ] && bash $SH_FILE ALL &&echo -e "$green重置规则成功$plain"
+    [ $installed -gt 2 ] && bash $SH_FILE ALL &&echo -e "${green}重置规则成功${plain}"
 }
 
 advanced_setting(){
@@ -407,7 +407,7 @@ echo && echo -e " iptables 端口转发一键管理脚本【支持DDNS&自启动
  ${green}8.${plain} 重新添加端口转发规则【可能可以解决部分问题】
  ${green}9.${plain} 高级设置
 
-${red}注意：初次使用前请请务必执行 ${green}1. 安装 iptables${red}(不仅仅是安装)${plain}" && check_state && echo
+${red}注意：初次使用前请请务必执行 ${green}1. 安装 iptables转发管理${red}(不仅仅是安装)${plain}" && check_state && echo
 read -e -p " 请输入数字 [1-9]:" num
 case "$num" in
     1)
