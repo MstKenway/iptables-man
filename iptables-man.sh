@@ -5,10 +5,10 @@ export PATH
 #=================================================
 #	System Required: CentOS/Debian/Ubuntu
 #	Description: iptables Port forwarding Management
-#	Version: 1.0.7
+#	Version: 1.0.8
 #	Author: Kenway
 #=================================================
-sh_ver="1.0.7"
+sh_ver="1.0.8"
 
 
 
@@ -22,7 +22,7 @@ red="\033[31m"
 green="\033[32m"
 plain="\033[0m"
 #设置回退格
-stty erase ^H
+#stty erase ^H
 
 
 #脚本需要以root身份运行
