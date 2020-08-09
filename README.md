@@ -2,7 +2,7 @@
 A script for forwarding by iptables[DDNS support]
 基于iptables的端口转发脚本
 
-version1.0.7
+version1.0.8
 
 支持Centos7+/Debian/Ubuntu
 
@@ -34,8 +34,8 @@ DDNS:本地端口:DDNS:原解析IP:远端端口
 
 ---
 更新日志：
-
-1.0.7：修复输入退格键问题
+1.0.8：修复部分手机客户端退出脚本后退格键问题
+1.0.7：修复输入退格键问题；修改定时任务写入形式，不再覆盖原文件，而是修改crontab文件（避免如ddns等定时任务被删除）
 
 
 
