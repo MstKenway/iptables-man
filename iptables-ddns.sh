@@ -5,10 +5,10 @@ export PATH
 #=================================================
 #	System Required: CentOS/Debian/Ubuntu
 #	Description: iptables Port forwarding Management With DDNS
-#	Version: 1.0.1
+#	Version: 1.0.2
 #	Author: Kenway
 #=================================================
-ver="1.0.1"
+ver="1.0.2"
 CONF_DIR="/etc/iptables-man"
 CONF_FILE=$CONF_DIR/iptables.conf
 #配置文件用localIP保存本地ip
@@ -52,8 +52,6 @@ add_iptables(){
     iptables -t nat -A POSTROUTING -p udp -d $remoteIP --dport $remotePort -j SNAT --to-source $local_IP
 }
 
-
-
 #导入静态IP,标识符是SIP
 IN_SIP(){
     local arr=(`cat $CONF_FILE|grep SIP|sed -n 's/^SIP://p'`)
@@ -86,7 +84,7 @@ IN_DDNS(){
         if [ "$tempIP" != "$remoteIP" ]
         then
             echo "Info:$ddns 域名IP发生变化，更新本地记录"
-            sed -i "s/$ddns\:$remoteIP/$ddns\:$tempIP/g" $CONF_FILE
+            sed -i "s/$localPort\:$ddns\:$remoteIP/$localPort\:$ddns\:$tempIP/g" $CONF_FILE
             remoteIP=$tempIP
         fi
         #先尝试删除端口占用
@@ -113,7 +111,7 @@ UP_DDNS(){
         if [ "$tempIP" != "$remoteIP" ]
         then
             echo "Info:$ddns 域名IP发生变化，更新本地记录"
-            sed -i "s/$ddns\:$remoteIP/$ddns\:$tempIP/g" $CONF_FILE
+            sed -i "s/$localPort\:$ddns\:$remoteIP/$localPort\:$ddns\:$tempIP/g" $CONF_FILE
             remoteIP=$tempIP
             #先尝试删除端口占用
         del_iptables $localPort
