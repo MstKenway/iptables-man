@@ -2,7 +2,9 @@
 A script for forwarding by iptables[DDNS support]
 基于iptables的端口转发脚本
 
-version1.0.8
+管理脚本version1.0.9
+
+后台脚本version1.0.3
 
 支持Centos7+/Debian/Ubuntu
 
@@ -34,6 +36,8 @@ DDNS:本地端口:DDNS:原解析IP:远端端口
 
 ---
 更新日志：
+
+2020/09/27:1.0.9&1.0.3:重要更新。修复当规则数大于10的时候，一段时间后存在规则没删的问题（或者乱删）的问题。此次iptables-man和iptables-ddns都需要更新。
 
 2020/08/28:更新iptables-ddns v1.0.2，修复对多个同一ddns的更新问题，更新iptables-ddns.sh的方法见下文。
 
