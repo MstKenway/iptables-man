@@ -5,10 +5,10 @@ export PATH
 #=================================================
 #	System Required: CentOS/Debian/Ubuntu
 #	Description: iptables Port forwarding Management
-#	Version: 1.0.8
+#	Version: 1.0.9
 #	Author: Kenway
 #=================================================
-sh_ver="1.0.8"
+sh_ver="1.0.9"
 
 
 
@@ -233,7 +233,7 @@ del_iptables(){
     [ $# -ne 1 ]&&exit 1
     local localPort=$1
     #删除旧的中转规则
-    local arr1=(`iptables -L PREROUTING -n -t nat --line-number |grep DNAT|grep "dpt:$localPort"|sort -r|awk '{print $1":"$3":"$9}'`)
+    local arr1=(`iptables -L PREROUTING -n -t nat --line-number |grep DNAT|grep "dpt:$localPort"|sort -rn|awk '{print $1":"$3":"$9}'`)
     for cell in ${arr1[@]}  # cell= 1:tcp:to:8.8.8.8:543
     do
         local arr2=(`echo $cell|tr -s ":" " "`)  #arr2=(1 tcp to 8.8.8.8 543)
@@ -244,7 +244,7 @@ del_iptables(){
         # echo 清除本机$localPort端口到$targetIP:$targetPort的${proto}的PREROUTING转发规则[$index]
         iptables -t nat  -D PREROUTING $index
         # echo ==清除对应的POSTROUTING规则
-        toRmIndexs=(`iptables -L POSTROUTING -n -t nat --line-number|grep SNAT|grep $targetIP|grep dpt:$targetPort|grep $proto|awk  '{print $1}'|sort -r|tr "\n" " "`)
+        toRmIndexs=(`iptables -L POSTROUTING -n -t nat --line-number|grep SNAT|grep $targetIP|grep dpt:$targetPort|grep $proto|awk  '{print $1}'|sort -rn|tr "\n" " "`)
         for cell1 in ${toRmIndexs[@]}
         do
             iptables -t nat  -D POSTROUTING $cell1
