@@ -70,6 +70,6 @@ sed -i "/iptables-ddns/d"  /etc/rc.local
 ```
 ---
 
-提醒：不要在生产环境使用脚本！！！
+提醒：不要在生产环境使用脚本！！！一键清空脚本可能会影响Docker等，请谨慎使用
 
 感谢iptablesUtils&iptables-pf，参考借鉴不少
